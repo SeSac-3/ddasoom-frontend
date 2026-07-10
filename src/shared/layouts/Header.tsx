@@ -67,7 +67,8 @@ export function Header() {
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary">
             <PawPrint size={15} className="text-white" />
           </div>
-          <span className="text-lg font-bold text-primary">따숨</span>
+          {/* [타이포] text-lg → text-xl (로고도 한 단계 상향) */}
+          <span className="text-xl font-bold text-primary">따숨</span>
         </Link>
 
         {/* 네비 — 4등분, hover 시 메가 드롭다운 */}
@@ -78,7 +79,8 @@ export function Header() {
               <button
                 key={menu.label}
                 onMouseEnter={() => open(menu.label)}
-                className={`relative flex flex-1 items-center justify-center text-sm font-medium transition-colors ${
+                // [타이포] text-sm → text-base
+                className={`relative flex flex-1 items-center justify-center text-base font-medium transition-colors ${
                   isActive ? 'text-primary' : 'text-foreground'
                 }`}
               >
@@ -115,7 +117,8 @@ export function Header() {
                       key={item.name}
                       to={item.to}
                       onClick={() => setActiveMenu(null)}
-                      className={`w-full rounded-lg py-2.5 text-center text-sm transition-colors hover:bg-secondary hover:text-primary ${
+                      // [타이포] text-sm → text-base
+                      className={`w-full rounded-lg py-2.5 text-center text-base transition-colors hover:bg-secondary hover:text-primary ${
                         menu.label === activeMenu ? 'text-foreground' : 'text-muted-foreground'
                       }`}
                     >
@@ -137,10 +140,11 @@ export function Header() {
 function GuestMenu() {
   return (
     <>
-      <Button variant="outline" size="sm" className="rounded-full" asChild>
+      {/* [타이포] size="sm" 제거 — 기본 크기 버튼으로 상향 */}
+      <Button variant="outline" className="rounded-full" asChild>
         <Link to="/login">로그인</Link>
       </Button>
-      <Button size="sm" className="rounded-full" asChild>
+      <Button className="rounded-full" asChild>
         <Link to="/signup">회원가입</Link>
       </Button>
     </>
@@ -166,12 +170,14 @@ function UserMenu({ nickname }: { nickname: string }) {
 
   return (
     <>
-      <Link to="/mypage" className="text-sm font-medium text-foreground transition-colors hover:text-primary">
+      {/* [타이포] text-sm → text-base */}
+      <Link to="/mypage" className="text-base font-medium text-foreground transition-colors hover:text-primary">
         {nickname}님
       </Link>
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button variant="outline" size="sm" className="rounded-full">로그아웃</Button>
+          {/* [타이포] size="sm" 제거 — 기본 크기 버튼으로 상향 */}
+          <Button variant="outline" className="rounded-full">로그아웃</Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
