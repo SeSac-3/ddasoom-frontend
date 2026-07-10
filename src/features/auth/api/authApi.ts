@@ -37,6 +37,13 @@ export interface LoginPayload {
   password: string;
 }
 
+// 요청: member/dto/request/SocialExtraInfoRequest.java — name, nickname, tel
+export interface SocialSignupPayload {
+  name: string;
+  nickname: string;
+  tel: string;
+}
+
 // 응답: auth/dto/response/SignupResponse.java — memberId(Long), email, nickname, role(Role enum)
 export interface SignupResult {
   memberId: number; // 백엔드 Long → TS number
@@ -78,6 +85,16 @@ export async function signup(payload: SignupPayload): Promise<SignupResult> {
   const res = await axiosInstance.post<ApiResponse<SignupResult>>('/auth/signup', payload);
   // ApiResponse 래퍼에서 실제 페이로드를 꺼낸다. signup 성공 응답은 data가 반드시 존재.
   return res.data.data as SignupResult;
+}
+
+/**
+ * 소셜 가입자 추가정보 입력 → USER 승급.
+ * 백엔드: PATCH /api/members/me/signup-complete (hasRole GUEST) — 닉네임 중복 시 409 AUTH_002.
+ * ⚠️ 성공 후 반드시 reissueAccessToken()을 호출해야 함 — AT의 role claim은 발급 시점 기준이라
+ *    재발급 전까지 토큰상 권한이 GUEST로 남는다 (SECURITY-FLOW.md 6번 ④ 표).
+ */
+export async function completeSocialSignup(payload: SocialSignupPayload): Promise<void> {
+  await axiosInstance.patch<ApiResponse<unknown>>('/members/me/signup-complete', payload);
 }
 
 /**
