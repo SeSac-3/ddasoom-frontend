@@ -34,8 +34,8 @@ export function OAuthCallbackPage() {
     // ── 실패 경로: FailureHandler가 error 쿼리를 실어 보냄 ──
     const errorCode = searchParams.get('error');
     if (errorCode) {
-      toast.error(ERROR_MESSAGES[errorCode] ?? DEFAULT_ERROR);
-      navigate('/login', { replace: true });
+      // 차단성 에러는 토스트(전환 중 유실 위험) 대신 로그인 페이지 배너로 — state로 문구 전달
+      navigate(`/login?error=${errorCode}`, { replace: true });
       return;
     }
 
@@ -54,9 +54,7 @@ export function OAuthCallbackPage() {
           navigate('/', { replace: true });
         }
       } catch {
-        // 쿠키 없이 직접 URL 진입했거나 RT가 이미 무효인 경우
-        toast.error(DEFAULT_ERROR);
-        navigate('/login', { replace: true });
+        navigate('/login', { replace: true, state: { errorMessage: DEFAULT_ERROR } });
       }
     })();
   }, [navigate, searchParams, setAuth]);

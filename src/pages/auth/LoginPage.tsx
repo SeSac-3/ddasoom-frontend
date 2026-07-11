@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { AlertCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -22,7 +23,17 @@ type LoginForm = z.infer<typeof loginSchema>;
 export function LoginPage() {
   const navigate = useNavigate();
   const setAuth = useAuthStore((s) => s.setAuth);
+  const [searchParams] = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const LOGIN_ERROR_MESSAGES: Record<string, string> = {
+      AUTH_106: '이미 해당 이메일로 가입된 계정이 있어요. 아래에서 이메일 로그인으로 이용해 주세요.',
+      AUTH_107: '소셜 계정의 이메일 제공에 동의해 주세요.',
+    };
+    const errorCode = searchParams.get('error');
+    const externalError = errorCode
+      ? (LOGIN_ERROR_MESSAGES[errorCode] ?? '소셜 로그인에 실패했습니다. 다시 시도해 주세요.')
+      : undefined;  
 
   const {
     register, handleSubmit, setError,
@@ -51,6 +62,12 @@ export function LoginPage() {
 
   return (
     <AuthCard title="로그인" description="따숨에 오신 것을 환영해요">
+      {externalError && (
+        <div className="mb-5 flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3">
+          <AlertCircle size={18} className="mt-0.5 shrink-0 text-destructive" />
+          <p className="text-sm font-medium text-destructive">{externalError}</p>
+        </div>
+      )}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
         <div>
           <Input
