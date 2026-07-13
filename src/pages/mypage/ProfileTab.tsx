@@ -11,6 +11,7 @@ import {
   type MemberInfo, type LoginLogItem,
 } from '@/features/mypage/api/memberApi';
 import { checkNicknameAvailable } from '@/features/auth/api/authApi';
+import { LoginLogsModal } from '@/features/mypage/components/LoginLogsModal';
 import { useAuthStore } from '@/shared/stores/authStore';
 import { Input } from '@/shared/components/ui/input';
 import {
@@ -348,6 +349,7 @@ const LOGIN_TYPE_LABEL: Record<string, string> = {
 
 function RecentLoginLogsCard() {
   const [logs, setLogs] = useState<LoginLogItem[] | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     getMyRecentLoginLogs().then(setLogs).catch(() => setLogs([]));
@@ -355,9 +357,17 @@ function RecentLoginLogsCard() {
 
   return (
     <section className="rounded-2xl border border-border bg-white p-6">
-      <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-foreground">
-        <LogIn size={19} className="text-ring" /> 최근 로그인 이력
-      </h2>
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="flex items-center gap-2 text-xl font-bold text-foreground">
+          <LogIn size={19} className="text-ring" /> 최근 로그인 이력
+        </h2>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="rounded-xl border border-ring/40 bg-secondary px-4 py-2 text-sm font-semibold text-ring transition-colors hover:bg-ring hover:text-white"
+        >
+          전체 보기
+        </button>
+      </div>
       {logs === null ? (
         <p className="text-sm text-muted-foreground">불러오는 중…</p>
       ) : logs.length === 0 ? (
@@ -372,7 +382,7 @@ function RecentLoginLogsCard() {
           ))}
         </ul>
       )}
-      {/* TODO: 전체 보기 — GET /members/me/login-logs 페이징 API 연동 (필요 시 별도 페이지/모달로 확장) */}
+      <LoginLogsModal open={isModalOpen} onOpenChange={setIsModalOpen} />
     </section>
   );
 }
