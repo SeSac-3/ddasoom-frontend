@@ -17,7 +17,12 @@ import { AnimalListPage } from '@/pages/animals/AnimalListPage';
 import { AnimalDetailPage } from '@/pages/animals/AnimalDetailPage';
 import { BoardListPage } from '@/pages/board/BoardListPage';
 import { FosterApplyPage } from '@/pages/foster/FosterApplyPage';
-import { MyPage } from '@/pages/mypage/MyPage';
+import { MyPageLayout } from '@/pages/mypage/MyPageLayout';
+import { ProfileTab } from '@/pages/mypage/ProfileTab';
+import { LikedAnimalsTab } from '@/pages/mypage/LikedAnimalsTab';
+import { FosterHistoryTab } from '@/pages/mypage/FosterHistoryTab';
+import { MyPostsTab } from '@/pages/mypage/MyPostsTab';
+import { MyCommentsTab } from '@/pages/mypage/MyCommentsTab';
 import { AdminLoginPage } from '@/pages/admin/AdminLoginPage';
 import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage';
 
@@ -46,7 +51,17 @@ export const router = createBrowserRouter([
         element: <RequireAuth />,
         children: [
           { path: 'foster/apply/:animalId', element: <FosterApplyPage /> },
-          { path: 'mypage', element: <MyPage /> },
+          {
+            path: 'mypage',
+            element: <MyPageLayout />,
+            children: [
+              { index: true, element: <ProfileTab /> },          // /mypage = 내 정보
+              { path: 'likes', element: <LikedAnimalsTab /> },
+              { path: 'fosters', element: <FosterHistoryTab /> },
+              { path: 'posts', element: <MyPostsTab /> },
+              { path: 'comments', element: <MyCommentsTab /> },
+            ],
+          },
         ],
       },
       { path: '*', element: <NotFoundPage /> },
