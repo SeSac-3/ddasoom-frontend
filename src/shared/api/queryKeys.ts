@@ -36,6 +36,13 @@ export const queryKeys = {
       [...queryKeys.admin.notices(), 'detail', id] as const,
 
     // ===== 구지훈 (유저 관리) =======
+    members: () => [...queryKeys.admin.all, 'members'] as const,
+    memberList: (params: { keyword?: string; role?: string; page?: number; size?: number }) =>
+      [...queryKeys.admin.members(), 'list', params] as const,
+    memberDetail: (id: number) =>
+      [...queryKeys.admin.members(), 'detail', id] as const,
+    memberLoginLogs: (id: number, page: number) =>
+      [...queryKeys.admin.members(), 'loginLogs', id, page] as const,
     // ===== 김경우 (임시보호 신청 관리) =======
     // ===== 유창호 (게시글 관리) =======
   },
