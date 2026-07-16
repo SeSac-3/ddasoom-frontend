@@ -1,6 +1,6 @@
 import { axiosInstance } from '@/shared/api/axiosInstance';
 import type { ApiResponse, PageResponse } from '@/shared/types/api';
-import type { PostListItem, PostListParams } from '../types';
+import type { PostCreatePayload, PostListItem, PostListParams } from '../types';
 
 // features/board 도메인 API 모듈. 작성 방식은 features/auth/api/authApi.ts 참고.
 
@@ -18,4 +18,9 @@ export async function getPosts(
     { params },
   );
   return res.data.data as PageResponse<PostListItem>;
+}
+
+export async function createPost(payload: PostCreatePayload): Promise<number> {
+  const res = await axiosInstance.post<ApiResponse<number>>('/posts', payload);
+  return res.data.data as number; // postId
 }
