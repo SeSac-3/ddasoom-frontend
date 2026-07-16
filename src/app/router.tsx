@@ -28,6 +28,8 @@ import { AdminLoginPage } from '@/pages/admin/AdminLoginPage';
 import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage';
 import { AdminNoticeListPage } from '@/pages/admin/AdminNoticeListPage';
 import { AdminNoticeFormPage } from '@/pages/admin/AdminNoticeFormPage';
+import { AdminMemberListPage } from '@/pages/admin/AdminMemberListPage';
+import { AdminMemberDetailPage } from '@/pages/admin/AdminMemberDetailPage';
 import { AboutPage } from '@/pages/about/AboutPage';
 import { GuidePage } from '@/pages/about/GuidePage';
 
@@ -89,7 +91,14 @@ export const router = createBrowserRouter([
           { path: 'notices', element: <AdminNoticeListPage /> },
           { path: 'notices/new', element: <AdminNoticeFormPage /> },
           { path: 'notices/:noticeId/edit', element: <AdminNoticeFormPage /> },
-          { path: '*', element: <AdminDashboardPage /> }, // /admin/** (관리 서브페이지 자리)
+          // ── 유저 관리 (구지훈) ──
+          { path: 'members', element: <AdminMemberListPage /> },
+          { path: 'members/:memberId', element: <AdminMemberDetailPage /> },
+          
+          // ── 임시보호 관리 (김경우) ── 추가 예정
+          // ── 게시글 관리 (유창호) ── 추가 예정
+          
+          { path: '*', element: <AdminDashboardPage /> }, // /admin/** (관리 서브페이지 자리) 항상 맨 아래 유지
         ],
       },
     ],
