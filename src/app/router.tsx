@@ -28,13 +28,10 @@ import { AdminLoginPage } from '@/pages/admin/AdminLoginPage';
 import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage';
 import { AdminNoticeListPage } from '@/pages/admin/AdminNoticeListPage';
 import { AdminNoticeFormPage } from '@/pages/admin/AdminNoticeFormPage';
-<<<<<<< HEAD
 import { AdminMemberListPage } from '@/pages/admin/AdminMemberListPage';
 import { AdminMemberDetailPage } from '@/pages/admin/AdminMemberDetailPage';
-=======
 import { AdminFaqListPage } from '@/pages/admin/AdminFaqListPage';
 import { AdminFaqFormPage } from '@/pages/admin/AdminFaqFormPage';
->>>>>>> main
 import { AboutPage } from '@/pages/about/AboutPage';
 import { GuidePage } from '@/pages/about/GuidePage';
 import { NoticeListPage } from '@/pages/support/NoticeListPage';
