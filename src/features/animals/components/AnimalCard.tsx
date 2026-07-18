@@ -24,8 +24,7 @@ const GENDER = {
 } as const;
 
 // 이미지 NULL(공공API 미제공) 대비 placeholder
-const FALLBACK_IMAGE =
-  "https://placehold.co/400x300/FFF3D6/9C8B75?text=%F0%9F%90%BE";
+const FALLBACK_IMAGE = import.meta.env.VITE_IMAGE_PLACEHOLDER;
 
 interface AnimalCardProps {
   animal: AnimalListItem;
