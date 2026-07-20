@@ -45,13 +45,13 @@ import { NoticeListPage } from '@/pages/support/NoticeListPage';
 import { NoticeDetailPage } from '@/pages/support/NoticeDetailPage';
 import { FaqListPage } from '@/pages/support/FaqListPage';
 import { FaqDetailPage } from '@/pages/support/FaqDetailPage';
-import { ReviewWritePage } from '@/pages/board/ReviewWritePage';
 import { PostDetailPage } from '@/pages/board/PostDetailPage';
 import { FosterDetailPage } from '@/pages/foster/FosterDetailPage';
 import { FosterEditPage } from '@/pages/foster/FosterEditPage';
 import { AdminFosterListPage } from '@/pages/admin/AdminFosterListPage';
 import { AdminFosterDetailPage } from '@/pages/admin/AdminFosterDetailPage';
 import { AdminFosterEditPage } from '@/pages/admin/AdminFosterEditPage';
+import { PostWritePage } from '@/pages/board/PostWritePage';
 
 // 전체 라우트 정의(단일 파일에서 관리). 역할별 라우트를 한곳에 모아 등록한다.
 // 현재는 경로 등록 + placeholder 페이지 연결까지만. 각 페이지 실제 구현은 도메인 담당자 몫.
@@ -98,8 +98,9 @@ export const router = createBrowserRouter([
               { path: 'comments', element: <MyCommentsTab /> },
             ],
           },
-          { path: 'board/review/write', element: <ReviewWritePage /> },
-          { path: 'board/review/:postId/edit', element: <ReviewWritePage /> }, // 작성 페이지 겸용(수정 모드)
+          // 게시판 공통 작성/수정 — 'write'는 정적 세그먼트라 공개 상세(:postId)보다 우선 매칭
+          { path: 'board/:boardType/write', element: <PostWritePage /> },
+          { path: 'board/:boardType/:postId/edit', element: <PostWritePage /> }, // 작성 페이지 겸용(수정 모드)
 
           // ===== QNA — 1:1 문의 (이서진) =======
           // 공지/FAQ와 같은 support/ 하위 경로(헤더·푸터 '고객센터' 메뉴와 정합).
@@ -145,7 +146,10 @@ export const router = createBrowserRouter([
 
           // ===== 임시보호 신청 관리 (김경우) =======
           { path: 'fosters', element: <AdminFosterListPage /> },
-          { path: 'active-fosters', element: <AdminFosterListPage activeOnly /> },
+          {
+            path: 'active-fosters',
+            element: <AdminFosterListPage activeOnly />,
+          },
           { path: 'fosters/:fosterId/edit', element: <AdminFosterEditPage /> },
           { path: 'fosters/:fosterId', element: <AdminFosterDetailPage /> },
           // ===== 게시글 관리 (유창호) =======

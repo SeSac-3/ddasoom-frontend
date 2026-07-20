@@ -24,14 +24,15 @@ import { useCreatePost } from '@/features/board/hooks/useCreatePost';
 import { useUpdatePost } from '@/features/board/hooks/useUpdatePost';
 import { usePostDetailQuery } from '@/features/board/hooks/usePostDetailQuery';
 import { useAuthStore } from '@/shared/stores/authStore';
+import { resolveBoard } from '@/features/board/types';
+import { NotFoundPage } from '@/pages/NotFoundPage';
 
-// 입양후기(ADOPTION_REVIEW) 작성/수정 겸용 페이지.
-// - /board/review/write          → 작성 모드
-// - /board/review/:postId/edit   → 수정 모드 (AdminNoticeFormPage의 new/edit 겸용 패턴 준수)
+// 게시판 공통 작성/수정 겸용 페이지 (입양후기·강아지·고양이).
+// - /board/:boardType/write          → 작성 모드
+// - /board/:boardType/:postId/edit   → 수정 모드 (AdminNoticeFormPage의 new/edit 겸용 패턴 준수)
+// boardType/카테고리는 slug → BOARD_BY_SLUG 설정에서 가져온다 (백엔드 화이트리스트와 일치).
 // 수정 모드에서는 상세 조회 HTML(영구 URL + data-image-id)을 에디터 initialHtml로 주입한다.
 // DeferredImage가 data-image-id를 파싱하므로 기존 이미지도 extractImageIds에 그대로 잡힌다.
-
-const REVIEW_CATEGORIES = ['강아지', '고양이'] as const;
 
 // 제목·카테고리만 zod 로 검증. 본문(RichTextEditor)은 RHF 밖(ref)이라 제출 시점에 수동 검증한다.
 const reviewSchema = z.object({
@@ -43,9 +44,10 @@ const reviewSchema = z.object({
 });
 type ReviewForm = z.infer<typeof reviewSchema>;
 
-export function ReviewWritePage() {
+export function PostWritePage() {
   const navigate = useNavigate();
-  const { postId } = useParams();
+  const { boardType: slug, postId } = useParams();
+  const board = resolveBoard(slug);
   const isEdit = postId != null;
   const numericId = isEdit ? Number(postId) : null;
 
@@ -79,30 +81,30 @@ export function ReviewWritePage() {
   }, [isEdit, post, reset]);
 
   // 수정 모드 가드 — 실검증(403 BOARD_002)은 백엔드 몫, 여기선 UX용 선차단.
-  // 이 페이지는 입양후기 전용이므로 다른 boardType 게시글 진입도 차단한다.
+  // URL slug의 게시판과 실제 게시글 boardType이 다르면(잘못된 경로) 목록으로 돌려보낸다.
   useEffect(() => {
-    if (!isEdit || !post) return;
-    if (post.boardType !== 'ADOPTION_REVIEW') {
-      toast.error('입양 후기 게시글만 수정할 수 있습니다.');
-      navigate('/board/review', { replace: true });
+    if (!isEdit || !post || !board) return;
+    if (post.boardType !== board.boardType) {
+      toast.error('잘못된 경로입니다.');
+      navigate(`/board/${slug}`, { replace: true });
       return;
     }
     if (user && post.author.memberId !== user.memberId) {
       toast.error('본인이 작성한 게시글만 수정할 수 있습니다.');
-      navigate('/board/review', { replace: true });
+      navigate(`/board/${slug}`, { replace: true });
     }
-  }, [isEdit, post, user, navigate]);
+  }, [isEdit, post, board, slug, user, navigate]);
 
   // 없거나 삭제된 게시글(BOARD_001) — 목록으로 돌려보낸다.
   useEffect(() => {
     if (isEdit && isError) {
       toast.error('게시글을 찾을 수 없습니다.');
-      navigate('/board/review', { replace: true });
+      navigate(`/board/${slug}`, { replace: true });
     }
-  }, [isEdit, isError, navigate]);
+  }, [isEdit, isError, slug, navigate]);
 
   const onSubmit = async (form: ReviewForm) => {
-    if (isSaving || !editorRef.current) return;
+    if (isSaving || !editorRef.current || !board) return;
     setIsSaving(true);
     try {
       // 1) 본문 이미지 일괄 업로드 + 확정 HTML/imageIds 획득.
@@ -128,7 +130,7 @@ export function ReviewWritePage() {
       //    대표 이미지 정책: 본문 첫 이미지 = 썸네일 (작성과 동일 규칙 — 명시 선택 UI 도입 전까지 유지).
       //    수정 시 imageIds 는 "최종" 목록 — 빠진 기존 이미지는 백엔드 syncImages 가 soft delete.
       const body = {
-        boardType: 'ADOPTION_REVIEW',
+        boardType: board.boardType,
         category: form.category,
         title: form.title,
         content: payload.html,
@@ -159,11 +161,14 @@ export function ReviewWritePage() {
 
       // 4) 저장 성공 후에만 임시 blob(IndexedDB) 정리 + 상세로 이동.
       await editorRef.current.cleanup();
-      navigate(`/board/review/${savedPostId}`);
+      navigate(`/board/${slug}/${savedPostId}`);
     } finally {
       setIsSaving(false);
     }
   };
+
+  // 알 수 없는 slug → NotFound (BoardListPage와 동일 원칙)
+  if (!board) return <NotFoundPage />;
 
   // 수정 모드: 상세 로드 전에는 에디터를 마운트하지 않는다.
   // useEditor 의 content 는 초기화 시점에만 반영되므로, 데이터 확보 후 initialHtml 과 함께 마운트해야 한다.
@@ -178,7 +183,7 @@ export function ReviewWritePage() {
   return (
     <div className='mx-auto max-w-3xl px-4 py-8'>
       <h1 className='mb-6 text-xl font-semibold'>
-        {isEdit ? '입양 후기 수정' : '입양 후기 작성'}
+        {board.label} {isEdit ? '수정' : '작성'}
       </h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
@@ -193,7 +198,7 @@ export function ReviewWritePage() {
                   <SelectValue placeholder='카테고리를 선택하세요' />
                 </SelectTrigger>
                 <SelectContent>
-                  {REVIEW_CATEGORIES.map((c) => (
+                  {board.categories.map((c) => (
                     <SelectItem key={c} value={c}>
                       {c}
                     </SelectItem>
@@ -227,7 +232,7 @@ export function ReviewWritePage() {
             ref={editorRef}
             ownerType='POST'
             initialHtml={isEdit && post ? post.content : ''}
-            placeholder='입양 후기를 남겨주세요'
+            placeholder='내용을 입력해주세요'
           />
         </div>
 
@@ -244,7 +249,7 @@ export function ReviewWritePage() {
           <Button
             type='button'
             variant='outline'
-            onClick={() => navigate('/board/review')}
+            onClick={() => navigate(`/board/${slug}`)}
             disabled={isSaving}
           >
             취소
