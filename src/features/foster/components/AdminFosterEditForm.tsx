@@ -141,7 +141,7 @@ function getServerErrorMessage(error: unknown): string {
   }
 
   if (code === 'FOSTER_008') {
-    return '임시보호 일정의 순서를 다시 확인해 주세요.';
+    return '상태에 맞는 임시보호 일정 정보를 다시 확인해 주세요.';
   }
 
   if (code === 'FOSTER_013') {
