@@ -93,12 +93,12 @@ const fosterAdminEditSchema = z
     if (
       values.fosterEndAt &&
       values.fosterExtendAt &&
-      values.fosterEndAt > values.fosterExtendAt
+      values.fosterEndAt >= values.fosterExtendAt
     ) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['fosterExtendAt'],
-        message: '연장일은 기본 종료일보다 빠를 수 없습니다.',
+        message: '연장일은 기본 종료일보다 늦어야 합니다.'
       });
     }
 
