@@ -15,14 +15,14 @@ export function usePostsQuery(params: PostListParams, enabled = true) {
 /**
  * 게시글 상세 조회.
  * postId가 유효한 숫자가 아니면(잘못된 URL) 조회를 스킵 — 페이지에서 NotFound 처리.
- * ⚠️ GET 상세는 서버 조회수 증가를 동반하므로 staleTime을 두어
- *    같은 세션 내 뒤로가기/재방문 시 불필요한 재조회(=조회수 중복 증가)를 줄인다.
+ * ⚠️ 조회수 중복 집계 방지는 서버(뷰어 단위 Redis dedup, TTL 30분)가 담당한다.
+ *    따라서 프론트는 재방문 시 자유롭게 refetch해도 되며(타인의 조회수 반영),
+ *    이전의 staleTime 캐시(재방문 시 조회수 미증가 원인)는 제거했다.
  */
 export function usePostDetailQuery(postId: number | null) {
   return useQuery({
     queryKey: queryKeys.board.detail(postId ?? -1),
     queryFn: () => getPostDetail(postId as number),
     enabled: postId != null,
-    staleTime: 60 * 1000, // 1분 — 목록↔상세 왕복 시 조회수 중복 증가 완화
   });
 }
