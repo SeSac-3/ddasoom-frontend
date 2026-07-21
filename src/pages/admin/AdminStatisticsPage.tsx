@@ -101,10 +101,10 @@ export function AdminStatisticsPage() {
 
         <div className="rounded-md border p-5 lg:col-span-3">
           <h2 className="mb-4 text-sm font-semibold text-foreground">등록 동물 종별 비율</h2>
-          <div className="flex flex-col items-center gap-3">
-            <ResponsiveContainer width="100%" height={150}>
+          <div className="flex items-center justify-between pr-4">
+            <ResponsiveContainer width="50%" height={200}>
               <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-                <Pie data={kindData} dataKey="count" nameKey="label" innerRadius={40} outerRadius={64} paddingAngle={2}>
+                <Pie data={kindData} dataKey="count" nameKey="label" innerRadius={52} outerRadius={82} paddingAngle={2}>
                   {kindData.map((entry) => (
                     <Cell key={entry.kind} fill={KIND_COLOR[entry.kind]} />
                   ))}
