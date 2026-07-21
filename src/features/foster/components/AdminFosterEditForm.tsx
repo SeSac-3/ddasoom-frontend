@@ -102,17 +102,6 @@ const fosterAdminEditSchema = z
       });
     }
 
-    if (
-      values.fosterStartAt &&
-      values.fosterCompleteAt &&
-      values.fosterStartAt > values.fosterCompleteAt
-    ) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['fosterCompleteAt'],
-        message: '최종 종료일은 시작일보다 빠를 수 없습니다.',
-      });
-    }
   });
 
 type FosterAdminEditFormValues = z.infer<typeof fosterAdminEditSchema>;
