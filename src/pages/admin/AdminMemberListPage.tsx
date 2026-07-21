@@ -4,6 +4,7 @@ import {
   type ColumnDef,
   type ColumnFiltersState,
   type SortingState,
+  type Row,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -39,12 +40,13 @@ const ROLE_OPTIONS: { value: Role | 'ALL'; label: string }[] = [
 
 // ⚠️ 컴포넌트 바깥(모듈 스코프)에 둔다 — 렌더링마다 재생성되는 함수를 state로 넘기면
 // TanStack Table이 "필터 함수가 바뀌었다"고 오판해 페이지 리셋 → 리렌더 → 재생성 무한루프에 빠진다.
-function globalFilterFn(row: { original: AdminMemberListItem }, _columnId: string, filterValue: string) {
-  const q = filterValue.toLowerCase();
-  return (
-    row.original.email.toLowerCase().includes(q) ||
-    row.original.nickname.toLowerCase().includes(q)
-  );
+// globalFilterFn의 정식 시그니처는 (Row, columnId, filterValue) — 첫 인자는 Row 객체다.
+function globalFilterFn(row: Row<AdminMemberListItem>, _columnId: string, filterValue: string) {
+  const q = String(filterValue ?? '').toLowerCase().trim();
+  if (q === '') return true;   // 검색어 비면 전체 통과
+  const email = row.original.email?.toLowerCase() ?? '';
+  const nickname = row.original.nickname?.toLowerCase() ?? '';
+  return email.includes(q) || nickname.includes(q);
 }
 
 // 컬럼 정의도 모듈 스코프 — 매 렌더 재생성 방지 (데이터 자체가 없으므로 컴포넌트 상태 의존 없음)
@@ -116,6 +118,8 @@ export function AdminMemberListPage() {
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     globalFilterFn,
+    // 커스텀 globalFilterFn을 쓸 때 컬럼별 필터 가능 판정이 꺼지는 경우가 있어 명시적으로 true 고정
+    getColumnCanGlobalFilter: () => true,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
