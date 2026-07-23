@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { PawPrint, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import logo from '@/assets/logo.png';
 import { useAuthStore } from '@/shared/stores/authStore';
 import { logout } from '@/features/auth/api/authApi';
 import {
@@ -27,9 +28,7 @@ const NAV_MENUS = [
   },
   {
     label: '임시보호',
-    items: [
-      { label: '신청 내역', to: '/mypage/fosters' },
-    ],
+    items: [{ label: '신청 내역', to: '/mypage/fosters' }],
   },
   {
     label: '펫 커뮤니티',
@@ -84,13 +83,14 @@ export function Header() {
     >
       {/* ── 상단바 ── */}
       <div className='mx-auto flex h-16 max-w-6xl items-center px-6'>
-        {/* 로고 */}
-        <Link to='/' className={`${LOGO_W} flex shrink-0 items-center gap-2`}>
-          <div className='flex h-8 w-8 items-center justify-center rounded-full bg-primary'>
-            <PawPrint size={15} className='text-white' />
-          </div>
-          {/* [타이포] text-lg → text-xl (로고도 한 단계 상향) */}
-          <span className='text-xl font-bold text-primary'>따숨</span>
+        {/* 로고 — 발자국 아이콘 + 워드마크가 한 이미지에 포함된 브랜드 로고 */}
+        <Link to='/' className={`${LOGO_W} flex shrink-0 items-center`}>
+          <img
+            src={logo}
+            alt='따숨'
+            // 원본 500x250(투명 여백 포함). h-12 기준 렌더 폭 96px로 LOGO_W(144px) 안에 들어간다
+            className='h-10 w-auto'
+          />
         </Link>
 
         {/* 네비 — 4등분, hover 시 메가 드롭다운 */}
